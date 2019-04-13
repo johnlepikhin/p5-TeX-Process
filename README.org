@@ -8,7 +8,7 @@ Parser returns simple self-documented AST structure which can be
 processed with all Perl power.
 
 #+NAME: Parser
-#+BEGIN_SRC perl :results output code
+#+BEGIN_SRC perl :results output code :exports both
   use Data::Dumper;
   use TeX::Processor::Parser;
 
@@ -376,6 +376,7 @@ following modufications to AST will be applied:
 
 Will print:
 
+#+RESULTS: Processor
 #+BEGIN_SRC latex
 
 \large \textbf{Large bold text}
