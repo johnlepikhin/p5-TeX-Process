@@ -376,7 +376,6 @@ following modufications to AST will be applied:
 
 Will print:
 
-#+RESULTS: Processor
 #+BEGIN_SRC latex
 
 \large \textbf{Large bold text}
