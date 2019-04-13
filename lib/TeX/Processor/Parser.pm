@@ -53,6 +53,12 @@ sub lexer {
             if ( $s =~ m{\G \\ \\ }gcx ) {
                 return { type => 'TEXT', content => '\\\\', startpos => ( pos $s ) - 2, endpos => ( pos $s ), line => $line };
             }
+            if ( $s =~ m{\G \\ \& }gcx ) {
+                return { type => 'TEXT', content => '&', startpos => ( pos $s ) - 2, endpos => ( pos $s ), line => $line };
+            }
+            if ( $s =~ m{\G \\ \$ }gcx ) {
+                return { type => 'TEXT', content => '$', startpos => ( pos $s ) - 2, endpos => ( pos $s ), line => $line };
+            }
             if ( $s =~ m{\G \\ \{ }gcx ) {
                 return { type => 'TEXT', content => '{', startpos => ( pos $s ) - 2, endpos => ( pos $s ), line => $line };
             }
@@ -158,17 +164,7 @@ sub parse {
             return;
         }
 
-        my $arg = $parse_base->( @_, croak_on_unexpected_token => 0 );
-
-        $token = $lexer->{get}();
-
-        if ( ! defined $token ) {
-            $parse_eof_error->();
-        }
-
-        if ( $token->{type} ne $end ) {
-            $parse_error->( msg => "Expected $end, but got $token->{type}" );
-        }
+        my $arg = $parse_base->( @_, stop_check => sub { $_[0]->{type} eq $end } );
 
         return $arg;
     };
@@ -178,24 +174,24 @@ sub parse {
         my $command = shift;
 
         my @args;
-        while (defined (my $token = $lexer->{get}())) {
-            if ($token->{type} eq 'L_SQ_BRACKET') {
+        while ( defined( my $token = $lexer->{get}() ) ) {
+            if ( $token->{type} eq 'L_SQ_BRACKET' ) {
                 $lexer->{rollback}();
                 my $arg = {
                     content => $parse_group->( begin => 'L_SQ_BRACKET', end => 'R_SQ_BRACKET' ),
-                    type => 'bracket'
-                   };
+                    type    => 'bracket'
+                };
                 push @args, $arg;
-                next
+                next;
             }
-            if ($token->{type} eq 'L_BRACE') {
+            if ( $token->{type} eq 'L_BRACE' ) {
                 $lexer->{rollback}();
                 my $arg = {
                     content => $parse_group->( begin => 'L_BRACE', end => 'R_BRACE' ),
-                    type => 'brace'
-                   };
+                    type    => 'brace'
+                };
                 push @args, $arg;
-                next
+                next;
             }
 
             $lexer->{rollback}();
@@ -208,31 +204,30 @@ sub parse {
     };
 
     $parse_base = sub {
-        my $croak_on_unexpected_token = get_arg croak_on_unexpected_token => @_;
-        my $in_math = get_arg_opt in_math => 0, @_;
+        my $stop_check = get_arg_opt stop_check => sub {0}, @_;
+
         my @r;
         while ( defined( my $token = $lexer->{get}() ) ) {
+            if ( $stop_check->($token) ) {
+                last;
+            }
 
-            # This syntax is not supported yet. Interpret as text
-            if ( $token->{type} eq 'HASH' ) {
+            if ( $token->{type} eq 'L_SQ_BRACKET' ) {
                 $token->{type}    = 'TEXT';
-                $token->{content} = q{#};
+                $token->{content} = q{[};
             }
-            if ( $token->{type} eq 'CARET' ) {
+            if ( $token->{type} eq 'R_SQ_BRACKET' ) {
                 $token->{type}    = 'TEXT';
-                $token->{content} = q{^};
+                $token->{content} = q{]};
             }
-            if ( $token->{type} eq 'AMPERSAND' ) {
-                $token->{type}    = 'TEXT';
-                $token->{content} = q{&};
-            }
-            if ( $token->{type} eq 'UNDERSCORE' ) {
-                $token->{type}    = 'TEXT';
-                $token->{content} = q{_};
-            }
-            if ( $token->{type} eq 'TILDA' ) {
-                $token->{type}    = 'TEXT';
-                $token->{content} = q{~};
+
+            if (   $token->{type} eq 'HASH'
+                || $token->{type} eq 'CARET'
+                || $token->{type} eq 'AMPERSAND'
+                || $token->{type} eq 'UNDERSCORE'
+                || $token->{type} eq 'TILDA' ) {
+                push @r, $token;
+                next;
             }
 
             if ( $token->{type} eq 'TEXT' || $token->{type} eq 'COMMENT' ) {
@@ -255,7 +250,7 @@ sub parse {
                 next;
             }
 
-            if ( ! $in_math && $token->{type} eq 'DOLLAR' ) {
+            if ( $token->{type} eq 'DOLLAR' ) {
                 $lexer->{rollback}();
                 my $children = $parse_group->( begin => 'DOLLAR', end => 'DOLLAR', in_math => 1 );
                 my $group = $token;
@@ -265,18 +260,13 @@ sub parse {
                 next;
             }
 
-            if ($croak_on_unexpected_token) {
-                $parse_error->( msg => "Unexpected token" );
-            } else {
-                $lexer->{rollback}();
-                last;
-            }
+            $parse_error->( msg => "Unexpected token" );
         }
 
         return \@r;
     };
 
-    $parse_base->( croak_on_unexpected_token => 1 );
+    $parse_base->();
 }
 
 1;

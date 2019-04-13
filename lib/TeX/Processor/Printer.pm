@@ -18,6 +18,12 @@ sub latex {
         my $lexema = shift;
 
         if ( $lexema->{type} eq 'TEXT' ) {
+            if ( $lexema->{content} eq '&' ) {
+                return "\\&";
+            }
+            if ( $lexema->{content} eq '$' ) {
+                return "\\\$";
+            }
             if ( $lexema->{content} eq '{' ) {
                 return "\\{";
             }
@@ -27,6 +33,21 @@ sub latex {
             return $lexema->{content};
         }
 
+        if ( $lexema->{type} eq 'TILDA' ) {
+            return q{~};
+        }
+        if ( $lexema->{type} eq 'HASH' ) {
+            return q{#};
+        }
+        if ( $lexema->{type} eq 'CARET' ) {
+            return q{^};
+        }
+        if ( $lexema->{type} eq 'AMPERSAND' ) {
+            return q{&};
+        }
+        if ( $lexema->{type} eq 'UNDERSCORE' ) {
+            return q{_};
+        }
         if ( $lexema->{type} eq 'L_SQ_BRACKET' ) {
             return q{[};
         }
