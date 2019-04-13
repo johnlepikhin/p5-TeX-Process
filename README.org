@@ -21,7 +21,7 @@ processed with all Perl power.
   END
       ;
 
-  print Dumper [ TeX::Processor::Parser::parse( document => $tex_string ) ];
+  print Dumper TeX::Processor::Parser::parse( document => $tex_string );
 #+END_SRC
 
 Will return AST representation of TeX document:
@@ -29,147 +29,145 @@ Will return AST representation of TeX document:
 #+RESULTS: Parser
 #+BEGIN_SRC perl
 $VAR1 = [
-          [
-            {
-              'content' => '  ',
-              'endpos' => 2,
-              'line' => 1,
-              'type' => 'TEXT',
-              'startpos' => 0
-            },
-            {
-              'endpos' => 8,
-              'args' => [
-                          {
-                            'type' => 'brace',
-                            'content' => [
-                                           {
-                                             'content' => 'document',
-                                             'endpos' => 17,
-                                             'line' => 1,
-                                             'startpos' => 9,
-                                             'type' => 'TEXT'
-                                           }
-                                         ]
-                          }
-                        ],
-              'line' => 1,
-              'startpos' => 3,
-              'type' => 'COMMAND',
-              'command' => 'begin'
-            },
-            {
-              'line' => 1,
-              'startpos' => 18,
-              'type' => 'TEXT',
-              'content' => '
+          {
+            'type' => 'TEXT',
+            'content' => '  ',
+            'endpos' => 2,
+            'line' => 1,
+            'startpos' => 0
+          },
+          {
+            'startpos' => 3,
+            'args' => [
+                        {
+                          'type' => 'brace',
+                          'content' => [
+                                         {
+                                           'startpos' => 9,
+                                           'endpos' => 17,
+                                           'line' => 1,
+                                           'content' => 'document',
+                                           'type' => 'TEXT'
+                                         }
+                                       ]
+                        }
+                      ],
+            'line' => 1,
+            'endpos' => 8,
+            'type' => 'COMMAND',
+            'command' => 'begin'
+          },
+          {
+            'content' => '
 ',
-              'endpos' => 19
-            },
-            {
-              'content' => '
+            'type' => 'TEXT',
+            'startpos' => 18,
+            'line' => 1,
+            'endpos' => 19
+          },
+          {
+            'startpos' => 19,
+            'line' => 2,
+            'endpos' => 20,
+            'content' => '
 ',
-              'endpos' => 20,
-              'startpos' => 19,
-              'line' => 2,
-              'type' => 'TEXT'
-            },
-            {
-              'line' => 3,
-              'type' => 'TEXT',
-              'startpos' => 20,
-              'content' => '  ',
-              'endpos' => 22
-            },
-            {
-              'type' => 'COMMAND',
-              'line' => 3,
-              'startpos' => 23,
-              'command' => 'tiny',
-              'args' => [],
-              'endpos' => 27
-            },
-            {
-              'endpos' => 28,
-              'content' => ' ',
-              'type' => 'TEXT',
-              'line' => 3,
-              'startpos' => 27
-            },
-            {
-              'command' => 'textbf',
-              'line' => 3,
-              'startpos' => 29,
-              'type' => 'COMMAND',
-              'endpos' => 35,
-              'args' => [
-                          {
-                            'content' => [
-                                           {
-                                             'endpos' => 50,
-                                             'content' => 'tiny bold text',
-                                             'startpos' => 36,
-                                             'line' => 3,
-                                             'type' => 'TEXT'
-                                           }
-                                         ],
-                            'type' => 'brace'
-                          }
-                        ]
-            },
-            {
-              'endpos' => 52,
-              'content' => '
+            'type' => 'TEXT'
+          },
+          {
+            'line' => 3,
+            'endpos' => 22,
+            'startpos' => 20,
+            'type' => 'TEXT',
+            'content' => '  '
+          },
+          {
+            'startpos' => 23,
+            'line' => 3,
+            'endpos' => 27,
+            'args' => [],
+            'type' => 'COMMAND',
+            'command' => 'tiny'
+          },
+          {
+            'type' => 'TEXT',
+            'content' => ' ',
+            'endpos' => 28,
+            'line' => 3,
+            'startpos' => 27
+          },
+          {
+            'startpos' => 29,
+            'args' => [
+                        {
+                          'content' => [
+                                         {
+                                           'startpos' => 36,
+                                           'endpos' => 50,
+                                           'line' => 3,
+                                           'content' => 'tiny bold text',
+                                           'type' => 'TEXT'
+                                         }
+                                       ],
+                          'type' => 'brace'
+                        }
+                      ],
+            'endpos' => 35,
+            'line' => 3,
+            'type' => 'COMMAND',
+            'command' => 'textbf'
+          },
+          {
+            'startpos' => 51,
+            'line' => 3,
+            'endpos' => 52,
+            'content' => '
 ',
-              'type' => 'TEXT',
-              'line' => 3,
-              'startpos' => 51
-            },
-            {
-              'line' => 4,
-              'startpos' => 52,
-              'type' => 'TEXT',
-              'content' => '
+            'type' => 'TEXT'
+          },
+          {
+            'startpos' => 52,
+            'line' => 4,
+            'endpos' => 53,
+            'content' => '
 ',
-              'endpos' => 53
-            },
-            {
-              'line' => 5,
-              'startpos' => 53,
-              'type' => 'TEXT',
-              'content' => '  ',
-              'endpos' => 55
-            },
-            {
-              'command' => 'end',
-              'line' => 5,
-              'type' => 'COMMAND',
-              'startpos' => 56,
-              'endpos' => 59,
-              'args' => [
-                          {
-                            'type' => 'brace',
-                            'content' => [
-                                           {
-                                             'endpos' => 68,
-                                             'content' => 'document',
-                                             'type' => 'TEXT',
-                                             'line' => 5,
-                                             'startpos' => 60
-                                           }
-                                         ]
-                          }
-                        ]
-            },
-            {
-              'endpos' => 70,
-              'content' => '
+            'type' => 'TEXT'
+          },
+          {
+            'content' => '  ',
+            'type' => 'TEXT',
+            'startpos' => 53,
+            'endpos' => 55,
+            'line' => 5
+          },
+          {
+            'startpos' => 56,
+            'line' => 5,
+            'endpos' => 59,
+            'args' => [
+                        {
+                          'type' => 'brace',
+                          'content' => [
+                                         {
+                                           'content' => 'document',
+                                           'type' => 'TEXT',
+                                           'startpos' => 60,
+                                           'endpos' => 68,
+                                           'line' => 5
+                                         }
+                                       ]
+                        }
+                      ],
+            'command' => 'end',
+            'type' => 'COMMAND'
+          },
+          {
+            'type' => 'TEXT',
+            'content' => '
 ',
-              'line' => 5,
-              'type' => 'TEXT',
-              'startpos' => 69
-            }
-          ]
+            'endpos' => 70,
+            'line' => 5,
+            'startpos' => 69
+          }
         ];
 #+END_SRC
 
