@@ -1,0 +1,169 @@
+* TeX::Processor
+
+Simple parser and printer for TeX-like syntaxes.
+
+** Parser
+
+Parser returns simple self-documented AST structure which can be
+processed with all Perl power.
+
+#+BEGIN_SRC perl
+  use TeX::Processor::Parser;
+
+my $tex_string = <<'END'
+\begin{document}
+
+\tiny \textbf{tiny bold text}
+
+\end{document}
+END
+;
+
+my $document = TeX::Processor::Parser::parse(document => $tex_string);
+#+END_SRC
+
+Sorts of structures which can be generated:
+
+*** Example 1
+
+Source:
+
+#+BEGIN_SRC latex
+text
+#+END_SRC
+
+Produces:
+
+#+BEGIN_SRC perl
+  [   {   'endpos'   => 4,
+          'content'  => 'test',
+          'line'     => 1,
+          'type'     => 'TEXT',
+          'startpos' => 0
+      } ]
+#+END_SRC
+
+*** Example 2
+
+Source:
+
+#+BEGIN_SRC latex
+\textbf{test}
+#+END_SRC
+
+Produces:
+
+#+BEGIN_SRC perl
+  [   {   'startpos' => 1,
+          'line'     => 1,
+          'type'     => 'COMMAND',
+          'endpos'   => 7,
+          'command'  => 'textbf',
+          'args'     => [
+              {   'content' => [
+                      {   'startpos' => 8,
+                          'endpos'   => 12,
+                          'type'     => 'TEXT',
+                          'content'  => 'test',
+                          'line'     => 1
+                      }
+                  ],
+                  'type' => 'brace'
+              } ] } ]
+#+END_SRC
+
+*** Example 3
+
+Source:
+
+#+BEGIN_SRC latex
+\usepackage[options]{packagename}
+#+END_SRC
+
+Produces:
+
+#+BEGIN_SRC perl
+  [   {   'type'     => 'COMMAND',
+          'line'     => 1,
+          'startpos' => 1,
+          'endpos'   => 11,
+          'args'     => [
+              {   'type'    => 'bracket',
+                  'content' => [
+                      {   'type'     => 'TEXT',
+                          'content'  => 'options',
+                          'line'     => 1,
+                          'startpos' => 12,
+                          'endpos'   => 19
+                      } ]
+              },
+              {   'content' => [
+                      {   'type'     => 'TEXT',
+                          'content'  => 'packagename',
+                          'line'     => 1,
+                          'startpos' => 21,
+                          'endpos'   => 32
+                      }
+                  ],
+                  'type' => 'brace'
+              }
+          ],
+          'command' => 'usepackage'
+      } ]
+#+END_SRC
+
+
+** Printer
+
+Currently only one function is available:
+~TeX::Processor::Printer::latex()~ which is actually just a reverse
+for parser, i.e. generates TeX structure from AST:
+
+#+BEGIN_SRC perl
+  use TeX::Processor::Printer;
+
+my $document =   [   {   'startpos' => 1,
+          'line'     => 1,
+          'type'     => 'COMMAND',
+          'endpos'   => 7,
+          'command'  => 'textbf',
+          'args'     => [
+              {   'content' => [
+                      {   'startpos' => 8,
+                          'endpos'   => 12,
+                          'type'     => 'TEXT',
+                          'content'  => 'test',
+                          'line'     => 1
+                      }
+                  ],
+                  'type' => 'brace'
+              } ] } ];
+
+# will print: \textbf{test}
+print TeX::Processor::Printer::latex(document => $document);
+#+END_SRC
+
+** Dependencies
+
+Module depends on Syntax::NamedArgs which is available here:
+https://github.com/johnlepikhin/p5-Syntax-NamedArgs
+
+** Installation
+
+To install this module type the following:
+
+#+BEGIN_SRC bash
+  perl Makefile.PL
+  make
+  make test
+  make install
+#+END_SRC
+
+** Copyright and license
+
+Copyright (C) 2019 by Evgenii Lepikhin
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.24.1 or,
+at your option, any later version of Perl 5 you may have available.
+
