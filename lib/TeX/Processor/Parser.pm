@@ -3,6 +3,8 @@ package TeX::Processor::Parser;
 use warnings;
 use strict;
 
+our $VERSION = '0.01';
+
 use Data::Dumper;
 use Carp qw(cluck croak confess);
 
