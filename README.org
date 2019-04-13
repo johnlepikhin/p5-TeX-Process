@@ -328,8 +328,8 @@ Will produce:
 
 There is some simple processing tools available. In the example below
 following modufications to AST will be applied:
- 1. All commands like '\tiny' will be replaced with '\large'
- 2. All commands like '\begin' and '\end' will be removed from
+ 1. All commands like ~\tiny~ will be replaced with ~\large~
+ 2. All commands like ~\begin~ and ~\end~ will be removed from
     document
  3. Commands matching regexp ~/^text/~ will get new arguments
 
