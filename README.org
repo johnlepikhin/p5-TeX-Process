@@ -7,19 +7,170 @@ Simple parser and printer for TeX-like syntaxes.
 Parser returns simple self-documented AST structure which can be
 processed with all Perl power.
 
-#+BEGIN_SRC perl
+#+NAME: Parser
+#+BEGIN_SRC perl :results output code
+  use Data::Dumper;
   use TeX::Processor::Parser;
 
-my $tex_string = <<'END'
-\begin{document}
+  my $tex_string = <<'END'
+    \begin{document}
 
-\tiny \textbf{tiny bold text}
+    \tiny \textbf{tiny bold text}
 
-\end{document}
-END
-;
+    \end{document}
+  END
+      ;
 
-my $document = TeX::Processor::Parser::parse(document => $tex_string);
+  print Dumper [ TeX::Processor::Parser::parse( document => $tex_string ) ];
+#+END_SRC
+
+Will return AST representation of TeX document:
+
+#+RESULTS: Parser
+#+BEGIN_SRC perl
+$VAR1 = [
+          [
+            {
+              'content' => '  ',
+              'endpos' => 2,
+              'line' => 1,
+              'type' => 'TEXT',
+              'startpos' => 0
+            },
+            {
+              'endpos' => 8,
+              'args' => [
+                          {
+                            'type' => 'brace',
+                            'content' => [
+                                           {
+                                             'content' => 'document',
+                                             'endpos' => 17,
+                                             'line' => 1,
+                                             'startpos' => 9,
+                                             'type' => 'TEXT'
+                                           }
+                                         ]
+                          }
+                        ],
+              'line' => 1,
+              'startpos' => 3,
+              'type' => 'COMMAND',
+              'command' => 'begin'
+            },
+            {
+              'line' => 1,
+              'startpos' => 18,
+              'type' => 'TEXT',
+              'content' => '
+',
+              'endpos' => 19
+            },
+            {
+              'content' => '
+',
+              'endpos' => 20,
+              'startpos' => 19,
+              'line' => 2,
+              'type' => 'TEXT'
+            },
+            {
+              'line' => 3,
+              'type' => 'TEXT',
+              'startpos' => 20,
+              'content' => '  ',
+              'endpos' => 22
+            },
+            {
+              'type' => 'COMMAND',
+              'line' => 3,
+              'startpos' => 23,
+              'command' => 'tiny',
+              'args' => [],
+              'endpos' => 27
+            },
+            {
+              'endpos' => 28,
+              'content' => ' ',
+              'type' => 'TEXT',
+              'line' => 3,
+              'startpos' => 27
+            },
+            {
+              'command' => 'textbf',
+              'line' => 3,
+              'startpos' => 29,
+              'type' => 'COMMAND',
+              'endpos' => 35,
+              'args' => [
+                          {
+                            'content' => [
+                                           {
+                                             'endpos' => 50,
+                                             'content' => 'tiny bold text',
+                                             'startpos' => 36,
+                                             'line' => 3,
+                                             'type' => 'TEXT'
+                                           }
+                                         ],
+                            'type' => 'brace'
+                          }
+                        ]
+            },
+            {
+              'endpos' => 52,
+              'content' => '
+',
+              'type' => 'TEXT',
+              'line' => 3,
+              'startpos' => 51
+            },
+            {
+              'line' => 4,
+              'startpos' => 52,
+              'type' => 'TEXT',
+              'content' => '
+',
+              'endpos' => 53
+            },
+            {
+              'line' => 5,
+              'startpos' => 53,
+              'type' => 'TEXT',
+              'content' => '  ',
+              'endpos' => 55
+            },
+            {
+              'command' => 'end',
+              'line' => 5,
+              'type' => 'COMMAND',
+              'startpos' => 56,
+              'endpos' => 59,
+              'args' => [
+                          {
+                            'type' => 'brace',
+                            'content' => [
+                                           {
+                                             'endpos' => 68,
+                                             'content' => 'document',
+                                             'type' => 'TEXT',
+                                             'line' => 5,
+                                             'startpos' => 60
+                                           }
+                                         ]
+                          }
+                        ]
+            },
+            {
+              'endpos' => 70,
+              'content' => '
+',
+              'line' => 5,
+              'type' => 'TEXT',
+              'startpos' => 69
+            }
+          ]
+        ];
 #+END_SRC
 
 Sorts of structures which can be generated:
@@ -112,35 +263,124 @@ Produces:
       } ]
 #+END_SRC
 
-
 ** Printer
 
 Currently only one function is available:
 ~TeX::Processor::Printer::latex()~ which is actually just a reverse
 for parser, i.e. generates TeX structure from AST:
 
-#+BEGIN_SRC perl
+#+name: Printer
+#+BEGIN_SRC perl :results output code :wrap "SRC latex"
   use TeX::Processor::Printer;
 
-my $document =   [   {   'startpos' => 1,
-          'line'     => 1,
-          'type'     => 'COMMAND',
-          'endpos'   => 7,
-          'command'  => 'textbf',
-          'args'     => [
+  my $document = [
+      {   'type'    => 'COMMAND',
+          'command' => 'textbf',
+          'args'    => [
               {   'content' => [
-                      {   'startpos' => 8,
-                          'endpos'   => 12,
-                          'type'     => 'TEXT',
-                          'content'  => 'test',
-                          'line'     => 1
+                      {   'type'    => 'TEXT',
+                          'content' => 'test',
                       }
                   ],
                   'type' => 'brace'
               } ] } ];
 
-# will print: \textbf{test}
-print TeX::Processor::Printer::latex(document => $document);
+  print TeX::Processor::Printer::latex( document => $document );
+#+END_SRC
+
+Will produce:
+
+#+RESULTS: Printer
+#+BEGIN_SRC latex
+\textbf{test}
+#+END_SRC
+
+** Make
+
+~TeX::Processor::Make~ is helper module with primitives for easy
+structure generation:
+
+#+name: Make
+#+BEGIN_SRC perl :results output code :wrap "SRC latex"
+  use TeX::Processor::Make;
+  use TeX::Processor::Printer;
+
+  my $text = TeX::Processor::Make::text('test');
+
+  my $command1 = TeX::Processor::Make::command( command => 'cmd' );
+
+  my $command2 = TeX::Processor::Make::command(
+      command => 'cmd',
+      args => [ { content => [$text], type => 'bracket' }, { content => [ $command1, $text ], type => 'brace' }, ],
+  );
+
+  my $group = TeX::Processor::Make::group( children => [ $text, $command1, $command2 ] );
+
+  print TeX::Processor::Printer::latex ( document => [$group] );
+#+END_SRC
+
+Will produce:
+
+#+RESULTS: Make
+#+BEGIN_SRC latex
+{test\cmd\cmd[test]{\cmdtest}}
+#+END_SRC
+
+** Processor
+
+There is some simple processing tools available. In the example below
+following modufications to AST will be applied:
+ 1. All commands like '\tiny' will be replaced with '\large'
+ 2. All commands like '\begin' and '\end' will be removed from
+    document
+ 3. Commands matching regexp ~/^text/~ will get new arguments
+
+#+name: Processor
+#+BEGIN_SRC perl :results output code :wrap "SRC latex"
+  use TeX::Processor::Parser;
+  use TeX::Processor::Printer;
+  use TeX::Processor::Make;
+  use TeX::Processor;
+
+  my $tex_string = <<'END'
+  \begin{document}
+  \tiny \textbf{tiny bold text}
+  \end{document}
+  END
+      ;
+
+  my $document = TeX::Processor::Parser::parse( document => $tex_string );
+  my $mapped = TeX::Processor::map_commands(
+      list => $document,
+      map  => {
+          begin => sub { },
+          end   => sub { },
+          tiny  => sub { TeX::Processor::Make::command( command => 'large' ) },
+      },
+      unified => sub {
+          my $command = shift;
+
+          if ( $command->{command} =~ m{^text} ) {
+              $command->{args} = [
+                  {   type    => 'brace',
+                      content => [ TeX::Processor::Make::text('Large bold text') ]
+                  },
+              ];
+              return 1, $command;
+          }
+      },
+  );
+
+  print TeX::Processor::Printer::latex document => $mapped;
+#+END_SRC
+
+Will print:
+
+#+RESULTS: Processor
+#+BEGIN_SRC latex
+
+\large \textbf{Large bold text}
+
 #+END_SRC
 
 ** Dependencies
