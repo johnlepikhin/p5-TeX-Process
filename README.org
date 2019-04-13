@@ -270,7 +270,7 @@ Currently only one function is available:
 for parser, i.e. generates TeX structure from AST:
 
 #+name: Printer
-#+BEGIN_SRC perl :results output code :wrap "SRC latex"
+#+BEGIN_SRC perl :results output code :wrap "SRC latex" :exports both
   use TeX::Processor::Printer;
 
   my $document = [
@@ -301,7 +301,7 @@ Will produce:
 structure generation:
 
 #+name: Make
-#+BEGIN_SRC perl :results output code :wrap "SRC latex"
+#+BEGIN_SRC perl :results output code :wrap "SRC latex" :exports both
   use TeX::Processor::Make;
   use TeX::Processor::Printer;
 
@@ -336,7 +336,7 @@ following modufications to AST will be applied:
  3. Commands matching regexp ~/^text/~ will get new arguments
 
 #+name: Processor
-#+BEGIN_SRC perl :results output code :wrap "SRC latex"
+#+BEGIN_SRC perl :results output code :wrap "SRC latex" :exports both
   use TeX::Processor::Parser;
   use TeX::Processor::Printer;
   use TeX::Processor::Make;
